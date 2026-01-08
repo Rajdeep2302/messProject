@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Rajdeep Pal" />
+    <meta property="og:title" content="AquaMonitor" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="/images/my-logo.png">
+    <title>AquaMonitor</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Audiowide&family=Cinzel+Decorative:wght@400;700;900&family=Indie+Flower&family=Momo+Signature&family=Sirin+Stencil&family=Warnes&family=Yatra+One&family=Zilla+Slab+Highlight:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./css/text.css" />
+
+    <script src="api.js"></script>
+  </head>
+
+  <body
+    class="relative min-h-screen w-screen overflow-x-hidden flex flex-col justify-start items-center py-5"
+  >
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      class="fixed top-0 left-0 w-full h-full object-cover -z-20"
+    >
+      <source src="./videos/water-bg.mp4" type="video/mp4" />
+    </video>
+
+    <div
+      class="fixed top-0 left-0 w-full h-full bg-gradient-to-tr from-[#0b132b]/80 to-[#1c2541]/80 -z-10"
+    ></div>
+
+    <header
+      class="fixed top-0 z-50 w-[95vw] sm:w-[92vw] md:w-[90vw] flex justify-center mt-3 sm:mt-4 md:mt-5"
+    >
+      <div
+        class="relative h-[56px] sm:h-[65px] md:h-[75px] w-full flex items-center justify-between"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 rounded-full border border-[#6fffe9]/30 shadow-md shadow-[#000814]/40 backdrop-blur-md"
+        ></div>
+
+        <div
+          class="relative flex items-center"
+          onclick="window.location.href = './index.html'"
+        >
+          <div
+            class="h-[56px] sm:h-[65px] md:h-[75px] aspect-square flex justify-center items-center"
+          >
+            <div
+              class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 h-[45px] sm:h-[52px] md:h-[60px] aspect-square rounded-full border-[#6fffe9]/30 border-b-2 border-r-2 shadow-md shadow-[#000814]/40"
+            ></div>
+            <i
+              class="fa-solid fa-droplet absolute text-[26px] sm:text-[32px] md:text-[40px] text-[#6fffe9]"
+            ></i>
+          </div>
+          <p
+            class="yatra text-[#5bc0be] text-[22px] sm:text-[30px] md:text-[40px] leading-none ml-1 sm:ml-2 whitespace-nowrap"
+          >
+            Aqua<span class="agbalumo text-[#eaeaea]">Monitor</span>
+          </p>
+        </div>
+      </div>
+      <button
+        class="relative h-[56px] sm:h-[65px] md:h-[75px] aspect-square flex justify-center ml-2 md:ml-4 items-center hover:scale-105 transition cursor-pointer"
+        aria-label="Open calendar"
+        onclick="window.location.href = './calendar.html'"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 hover:from-[#5bc0be]/20 hover:to-[#6fffe9]/20 rounded-full border border-[#6fffe9]/30 shadow-md shadow-[#000814]/40"
+        ></div>
+        <i
+          class="fa-solid fa-calendar-days text-[22px] sm:text-[28px] md:text-[35px] text-[#6fffe9]"
+        ></i>
+      </button>
+    </header>
+
+    <main
+      class="h-full w-[95vw] sm:w-[92vw] md:w-[90vw] pt-[80px] sm:pt-[97px] md:pt-[115px] flex flex-col gap-3"
+    >
+      <div
+        class="w-full sm:w-fit bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:gap-4"
+      >
+        <div class="text-center sm:text-left">
+          <p class="sirin text-[#eaeaea] text-[14px] sm:text-[16px]">
+            Total bottles ordered
+          </p>
+          <p
+            class="text-[#6fffe9] text-[16px] sm:text-[18px] font-semibold"
+            id="showCurrentYear"
+          >
+            Year 2026
+          </p>
+        </div>
+        <div class="hidden sm:block h-10 w-px bg-[#6fffe9]/30"></div>
+        <div
+          class="mt-3 sm:mt-0 flex justify-center items-center bg-gradient-to-br from-[#5bc0be]/20 to-[#6fffe9]/20 border border-[#6fffe9]/30 rounded-xl px-6 py-3 shadow-inner shadow-[#000814]/40"
+        >
+          <span
+            class="arvo text-[#eaeaea] text-[32px] sm:text-[36px] font-bold"
+            id="totalBottleCount"
+            >0</span
+          >
+        </div>
+      </div>
+
+      <div class="w-full flex flex-col sm:flex-row gap-3 justify-between">
+        <div
+          class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-5 py-4"
+        >
+          <p class="sirin text-[#eaeaea] text-[16px]">
+            <span id="currentMonth" class="text-[#6fffe9] font-semibold"></span>
+          </p>
+        </div>
+
+        <div class="relative w-full sm:w-fit" id="filterWrapper">
+          <button
+            id="filterBtn"
+            class="w-full flex items-center z-50 gap-2 justify-between bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-5 py-4 text-[#eaeaea]"
+          >
+            <span id="filterLabel">Filter</span>
+            <i
+              id="filterIcon"
+              class="fa-solid fa-chevron-down text-[#6fffe9] z-50 transition-transform"
+            ></i>
+          </button>
+          <ul
+            id="filterMenu"
+            class="absolute right-0 z-50 mt-2 w-full sm:w-56 bg-gradient-to-br from-[#000814]/80 to-[#001d3d]/80 border border-[#6fffe9]/30 rounded-xl shadow-xl shadow-[#000814]/60 backdrop-blur-md overflow-hidden scale-95 opacity-0 pointer-events-none transition-all duration-200 origin-top"
+          >
+            <li data-value="all">All</li>
+            <li data-value="date-asc">Sort by Date ↑</li>
+            <li data-value="date-desc">Sort by Date ↓</li>
+            <li data-value="Subhadip">Show Subhadip</li>
+            <li data-value="Rajdeep">Show Rajdeep</li>
+            <li data-value="Santu Da">Show SantuDa</li>
+          </ul>
+        </div>
+      </div>
+
+      <style>
+        #filterMenu li,
+        #paidByMenu li,
+        #editPaidByMenu li {
+          padding: 12px 16px;
+          cursor: pointer;
+          color: #eaeaea;
+          transition: background 0.2s, transform 0.1s;
+        }
+        #filterMenu li:hover,
+        #paidByMenu li:hover,
+        #editPaidByMenu li:hover {
+          background: rgba(111, 255, 233, 0.15);
+          color: #6fffe9;
+        }
+      </style>
+
+      <div
+        class="w-full overflow-x-auto rounded-2xl bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 shadow-lg shadow-[#000814]/50 backdrop-blur-md hidden sm:block mt-4"
+      >
+        <table class="w-full border-separate border-spacing-y-2 text-left">
+          <thead>
+            <tr class="text-[#6fffe9] sirin text-[15px]">
+              <th class="px-5 py-3">No.</th>
+              <th class="px-5 py-3">Date</th>
+              <th class="px-5 py-3">Bottles</th>
+              <th class="px-5 py-3">Amount</th>
+              <th class="px-5 py-3">Paid By</th>
+              <th class="px-5 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable" class="text-[#eaeaea] arvo text-[14px]"></tbody>
+        </table>
+      </div>
+
+      <div
+        id="mobileCards"
+        class="sm:hidden flex flex-col gap-3 mt-4 w-full"
+      ></div>
+
+      <div
+        id="emptyState"
+        class="hidden w-full mt-4 flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md py-10"
+      >
+        <i
+          class="fa-solid fa-droplet-slash text-[#6fffe9] text-[40px] mb-3"
+        ></i>
+        <p class="sirin text-[#eaeaea] text-[18px]">No data available now</p>
+        <p class="text-[#eaeaea]/70 text-[14px] mt-1">
+          Change filter or add a new entry
+        </p>
+      </div>
+
+      <div
+        id="passwordModal"
+        class="fixed inset-0 z-[999] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      >
+        <div
+          class="w-[90vw] max-w-sm bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-xl shadow-[#000814]/60 backdrop-blur-md p-6"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="sirin text-[#eaeaea] text-[18px]">Verify Password</h3>
+            <button
+              onclick="closePasswordModal()"
+              class="text-[#6fffe9] hover:scale-110 transition"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <p class="text-[#eaeaea]/70 text-[14px] mb-4">
+            Enter password to access edit mode
+          </p>
+          <form onsubmit="verifyPassword(event)" class="flex flex-col gap-4">
+            <div class="relative">
+              <input
+                type="password"
+                id="editPassword"
+                placeholder="Enter password"
+                required
+                class="w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9]"
+              />
+              <i
+                class="fa-solid fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-[#6fffe9]/70"
+              ></i>
+            </div>
+            <div class="flex gap-3 justify-end">
+              <button
+                type="button"
+                onclick="closePasswordModal()"
+                class="px-4 py-2 rounded-xl text-[#eaeaea]/80 hover:text-[#eaeaea]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="px-5 py-2 rounded-xl bg-[#5bc0be]/30 hover:bg-[#5bc0be]/40 text-[#6fffe9] font-semibold"
+              >
+                Verify
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div
+      id="addDataModal"
+      class="fixed inset-0 z-[999] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="w-full max-w-md bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-xl shadow-[#000814]/50 backdrop-blur-md p-6"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="sirin text-[#eaeaea] text-[18px]">Add Details</h3>
+          <button
+            onclick="closeAddModal()"
+            class="text-[#6fffe9] hover:scale-110 transition"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="text-[#eaeaea]/70 text-[14px] mb-4">
+          Enter today’s bottle purchase information
+        </p>
+        <form id="addDataForm" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]">Date</label>
+            <input
+              type="text"
+              id="currentDate"
+              readonly
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]">Total Bottles</label>
+            <input
+              type="number"
+              id="totalBottles"
+              min="1"
+              required
+              placeholder="Enter number of bottles"
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9]"
+            />
+            <p id="bottleError" class="text-red-400 text-[12px] hidden">
+              Enter at least 1 bottle
+            </p>
+          </div>
+          <div class="flex flex-col gap-1 relative">
+            <label class="text-[#6fffe9] text-[14px]">Paid By</label>
+            <button
+              type="button"
+              id="paidByBtn"
+              class="flex justify-between items-center bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            >
+              <span id="paidByLabel">Select person</span
+              ><i class="fa-solid fa-chevron-down text-[#6fffe9]"></i>
+            </button>
+            <ul
+              id="paidByMenu"
+              class="absolute top-full mt-2 w-full z-20 bg-gradient-to-br from-[#000814]/90 to-[#001d3d]/90 border border-[#6fffe9]/30 rounded-xl shadow-lg backdrop-blur-md scale-95 opacity-0 pointer-events-none transition-all"
+            >
+              <li data-value="Santu Da">Santu Da</li>
+              <li data-value="Subhadip">Subhadip</li>
+              <li data-value="Rajdeep">Rajdeep</li>
+            </ul>
+            <input type="hidden" id="paidByValue" required />
+            <p id="paidByError" class="text-red-400 text-[12px] hidden">
+              Please select a person
+            </p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]"
+              >Amount (₹25 × bottle)</label
+            >
+            <input
+              type="text"
+              id="amount"
+              readonly
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            />
+          </div>
+          <div class="flex justify-end gap-3 mt-2">
+            <button
+              type="button"
+              onclick="closeAddModal()"
+              class="px-4 py-2 text-[#eaeaea]/80 hover:text-[#eaeaea]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-2 rounded-xl bg-[#5bc0be]/30 hover:bg-[#5bc0be]/40 text-[#6fffe9] font-semibold"
+            >
+              Add
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      id="editDataModal"
+      class="fixed inset-0 z-[999] hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
+    >
+      <div
+        class="w-full max-w-md bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-xl shadow-[#000814]/50 backdrop-blur-md p-6"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="sirin text-[#eaeaea] text-[18px]">Edit Details</h3>
+          <button
+            onclick="closeEditModal()"
+            class="text-[#6fffe9] hover:scale-110 transition"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="text-[#eaeaea]/70 text-[14px] mb-4">
+          Modify bottle purchase information
+        </p>
+        <form id="editDataForm" class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]">Date</label>
+            <input
+              type="text"
+              id="editDate"
+              readonly
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]">Total Bottles</label>
+            <input
+              type="number"
+              id="editBottles"
+              min="1"
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9]"
+            />
+            <p id="editBottleError" class="text-red-400 text-[12px] hidden">
+              Bottle count must be at least 1
+            </p>
+          </div>
+          <div class="flex flex-col gap-1 relative">
+            <label class="text-[#6fffe9] text-[14px]">Paid By</label>
+            <button
+              type="button"
+              id="editPaidByBtn"
+              class="flex justify-between items-center bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            >
+              <span id="editPaidByLabel">Select person</span
+              ><i class="fa-solid fa-chevron-down text-[#6fffe9]"></i>
+            </button>
+            <ul
+              id="editPaidByMenu"
+              class="absolute top-full mt-2 w-full z-20 bg-gradient-to-br from-[#000814]/90 to-[#001d3d]/90 border border-[#6fffe9]/30 rounded-xl shadow-lg backdrop-blur-md scale-95 opacity-0 pointer-events-none transition-all"
+            >
+              <li data-value="Santu Da">Santu Da</li>
+              <li data-value="Subhadip">Subhadip</li>
+              <li data-value="Rajdeep">Rajdeep</li>
+            </ul>
+            <input type="hidden" id="editPaidByValue" />
+            <p id="editPaidByError" class="text-red-400 text-[12px] hidden">
+              Please select a person
+            </p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[#6fffe9] text-[14px]">Amount</label>
+            <input
+              type="text"
+              id="editAmount"
+              readonly
+              class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea]"
+            />
+          </div>
+          <div class="flex justify-end gap-3 mt-2">
+            <button
+              type="button"
+              onclick="closeEditModal()"
+              class="px-4 py-2 text-[#eaeaea]/80 hover:text-[#eaeaea]"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-6 py-2 rounded-xl bg-[#5bc0be]/30 hover:bg-[#5bc0be]/40 text-[#6fffe9] font-semibold"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer
+      class="fixed bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[95vw] sm:w-[92vw] md:w-[90vw] flex justify-end pointer-events-none"
+    >
+      <button
+        class="pointer-events-auto relative flex items-center gap-3 px-5 sm:px-6 h-[56px] sm:h-[65px] md:h-[72px] rounded-full bg-gradient-to-br from-[#5bc0be]/30 to-[#6fffe9]/30 border border-[#6fffe9]/40 shadow-lg shadow-[#000814]/60 backdrop-blur-md transition hover:scale-105 active:scale-95"
+        aria-label="Add new entry"
+        onclick="openAddModal()"
+      >
+        <span
+          class="absolute inset-0 rounded-full bg-gradient-to-br from-[#6fffe9]/20 to-transparent opacity-0 hover:opacity-100 transition"
+        ></span>
+        <span
+          class="relative h-[40px] w-[40px] sm:h-[46px] sm:w-[46px] md:h-[50px] md:w-[50px] flex items-center justify-center rounded-full bg-[#000814]/40"
+        >
+          <i
+            class="fa-solid fa-plus text-[20px] sm:text-[24px] md:text-[26px] text-[#6fffe9]"
+          ></i>
+        </span>
+        <span
+          class="relative hidden xs:inline text-[#eaeaea] sirin text-[14px] sm:text-[16px]"
+          >Add Data</span
+        >
+      </button>
+    </footer>
+
+    <script>
+      /* ================= CONFIG ================= */
+      const PRICE_PER_BOTTLE = 25;
+      const सहीPassword = "mess@12345";
+
+      /* ================= DATA (Now Dynamic) ================= */
+      // 1. Initialize empty array
+      let bottleData = [];
+      let pendingEditIndex = null;
+
+      /* ================= INIT API ================= */
+      // 2. Fetch data from backend
+      async function loadData() {
+        try {
+          bottleData = await fetchAllEntries(); // Function from api.js
+
+          // Optional: Sort by date descending (Newest first)
+          bottleData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+          renderData(bottleData);
+        } catch (error) {
+          console.error("Failed to load data:", error);
+          document.getElementById(
+            "dataTable"
+          ).innerHTML = `<tr><td colspan="6" class="text-center text-red-400 py-4">Error loading data. Check console.</td></tr>`;
+        }
+      }
+
+      /* ================= COMMON ELEMENTS ================= */
+      const tableBody = document.getElementById("dataTable");
+      const mobileCards = document.getElementById("mobileCards");
+      const emptyState = document.getElementById("emptyState");
+      const totalBottleCountEl = document.getElementById("totalBottleCount");
+      const currentMonthEl = document.getElementById("currentMonth");
+
+      /* ================= DATE ================= */
+      const now = new Date();
+      currentMonthEl.textContent = now.toLocaleDateString("en-GB", {
+        month: "long",
+        year: "numeric",
+      });
+
+      /* ================= FILTER ELEMENTS ================= */
+      const filterBtn = document.getElementById("filterBtn");
+      const filterMenu = document.getElementById("filterMenu");
+      const filterLabel = document.getElementById("filterLabel");
+
+      /* ================= ADD MODAL ================= */
+      const addModal = document.getElementById("addDataModal");
+      const addForm = document.getElementById("addDataForm");
+      const bottleInput = document.getElementById("totalBottles");
+      const amountInput = document.getElementById("amount");
+      const dateInput = document.getElementById("currentDate");
+      const paidByBtn = document.getElementById("paidByBtn");
+      const paidByMenu = document.getElementById("paidByMenu");
+      const paidByLabel = document.getElementById("paidByLabel");
+      const paidByValue = document.getElementById("paidByValue");
+      const bottleError = document.getElementById("bottleError");
+      const paidByError = document.getElementById("paidByError");
+
+      /* ================= PASSWORD MODAL ================= */
+      const passwordModal = document.getElementById("passwordModal");
+      const editPasswordInput = document.getElementById("editPassword");
+
+      /* ================= EDIT MODAL ================= */
+      const editModal = document.getElementById("editDataModal");
+      const editForm = document.getElementById("editDataForm");
+      const editDate = document.getElementById("editDate");
+      const editBottles = document.getElementById("editBottles");
+      const editAmount = document.getElementById("editAmount");
+      const editPaidByBtn = document.getElementById("editPaidByBtn");
+      const editPaidByMenu = document.getElementById("editPaidByMenu");
+      const editPaidByLabel = document.getElementById("editPaidByLabel");
+      const editPaidByValue = document.getElementById("editPaidByValue");
+      const editBottleError = document.getElementById("editBottleError");
+      const editPaidByError = document.getElementById("editPaidByError");
+
+      /* ================= FILTER LOGIC ================= */
+      filterBtn.onclick = (e) => {
+        e.stopPropagation();
+        filterMenu.classList.toggle("opacity-0");
+        filterMenu.classList.toggle("scale-95");
+        filterMenu.classList.toggle("pointer-events-none");
+      };
+
+      document.querySelectorAll("#filterMenu li").forEach((li) => {
+        li.onclick = () => {
+          const value = li.dataset.value;
+          filterLabel.textContent = li.textContent;
+          filterMenu.classList.add(
+            "opacity-0",
+            "scale-95",
+            "pointer-events-none"
+          );
+
+          let filteredData = [...bottleData];
+          if (value === "date-asc")
+            filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+          else if (value === "date-desc")
+            filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+          else if (value !== "all")
+            filteredData = filteredData.filter((item) => item.paidBy === value);
+
+          renderData(filteredData);
+        };
+      });
+
+      window.onclick = () => {
+        if (!filterMenu.classList.contains("opacity-0"))
+          filterMenu.classList.add(
+            "opacity-0",
+            "scale-95",
+            "pointer-events-none"
+          );
+      };
+
+      /* ================= ADD LOGIC ================= */
+      dateInput.value = now.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+      function openAddModal() {
+        addModal.classList.remove("hidden");
+      }
+      function closeAddModal() {
+        addModal.classList.add("hidden");
+        addForm.reset();
+        amountInput.value = "";
+        paidByLabel.textContent = "Select person";
+        paidByValue.value = "";
+      }
+
+      bottleInput.addEventListener("input", () => {
+        const count = Number(bottleInput.value);
+        amountInput.value = count > 0 ? `₹${count * PRICE_PER_BOTTLE}` : "";
+        if (count > 0) bottleError.classList.add("hidden");
+      });
+
+      paidByBtn.onclick = () => {
+        paidByMenu.classList.toggle("opacity-0");
+        paidByMenu.classList.toggle("scale-95");
+        paidByMenu.classList.toggle("pointer-events-none");
+      };
+
+      document.querySelectorAll("#paidByMenu li").forEach((li) => {
+        li.onclick = () => {
+          paidByLabel.textContent = li.dataset.value;
+          paidByValue.value = li.dataset.value;
+          paidByMenu.classList.add(
+            "opacity-0",
+            "scale-95",
+            "pointer-events-none"
+          );
+          paidByError.classList.add("hidden");
+        };
+      });
+
+      // 3. API ADD SUBMIT
+      addForm.onsubmit = async (e) => {
+        e.preventDefault();
+
+        if (bottleInput.value < 1 || !paidByValue.value) return;
+
+        /* --- FIX START --- */
+        const now = new Date();
+        // Get local components
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are 0-11
+        const day = String(now.getDate()).padStart(2, "0");
+
+        const localDate = `${year}-${month}-${day}`; // Result: "2026-01-09"
+        /* --- FIX END --- */
+
+        const payload = {
+          date: localDate, // Use the fixed local date
+          bottles: Number(bottleInput.value),
+          paidBy: paidByValue.value,
+        };
+
+        try {
+          await addEntry(payload);
+          closeAddModal();
+          loadData();
+        } catch (err) {
+          alert("Error adding entry: " + err.message);
+        }
+      };
+
+      /* ================= EDIT LOGIC ================= */
+      function editEntry(index) {
+        pendingEditIndex = index;
+        passwordModal.classList.remove("hidden");
+      }
+      function closePasswordModal() {
+        passwordModal.classList.add("hidden");
+        editPasswordInput.value = "";
+      }
+      function verifyPassword(e) {
+        e.preventDefault();
+        if (editPasswordInput.value !== सहीPassword) {
+          alert("Wrong password");
+          return;
+        }
+        closePasswordModal();
+        openEditModal(pendingEditIndex);
+      }
+
+      function openEditModal(index) {
+        const data = bottleData[index];
+        editDate.value = data.date;
+        editBottles.value = data.bottles;
+        editAmount.value = `₹${data.bottles * PRICE_PER_BOTTLE}`;
+        editPaidByLabel.textContent = data.paidBy;
+        editPaidByValue.value = data.paidBy;
+        editModal.classList.remove("hidden");
+      }
+      function closeEditModal() {
+        editModal.classList.add("hidden");
+      }
+
+      editBottles.addEventListener("input", () => {
+        const count = Number(editBottles.value);
+        if (count > 0) {
+          editAmount.value = `₹${count * PRICE_PER_BOTTLE}`;
+          editBottleError.classList.add("hidden");
+        }
+      });
+
+      editPaidByBtn.onclick = () => {
+        editPaidByMenu.classList.toggle("opacity-0");
+        editPaidByMenu.classList.toggle("scale-95");
+        editPaidByMenu.classList.toggle("pointer-events-none");
+      };
+
+      document.querySelectorAll("#editPaidByMenu li").forEach((li) => {
+        li.onclick = () => {
+          editPaidByLabel.textContent = li.dataset.value;
+          editPaidByValue.value = li.dataset.value;
+          editPaidByMenu.classList.add(
+            "opacity-0",
+            "scale-95",
+            "pointer-events-none"
+          );
+          editPaidByError.classList.add("hidden");
+        };
+      });
+
+      // 4. API UPDATE SUBMIT
+      editForm.onsubmit = async (e) => {
+        e.preventDefault();
+        if (editBottles.value < 1 || !editPaidByValue.value) return;
+
+        // FIXED: Use bottleData to get ID
+        const entryId = bottleData[pendingEditIndex]._id; // OR .id depending on backend
+
+        try {
+          await updateEntry(entryId, {
+            bottles: Number(editBottles.value),
+            paidBy: editPaidByValue.value,
+          });
+
+          closeEditModal();
+          loadData(); // Refresh list
+        } catch (err) {
+          alert("Error updating: " + err.message);
+        }
+      };
+
+      /* ================= RENDER ================= */
+      function renderData(data) {
+        tableBody.innerHTML = "";
+        mobileCards.innerHTML = "";
+
+        const totalBottles = data.reduce((sum, item) => sum + item.bottles, 0);
+        totalBottleCountEl.textContent = totalBottles;
+
+        if (!data.length) {
+          emptyState.classList.remove("hidden");
+          return;
+        }
+        emptyState.classList.add("hidden");
+
+        data.forEach((item, index) => {
+          const no = String(index + 1).padStart(2, "0");
+          // Calculate amount if API doesn't send it
+          const amount = item.amount || item.bottles * PRICE_PER_BOTTLE;
+
+          tableBody.innerHTML += `
+            <tr class="bg-[#000814]/30 hover:bg-[#6fffe9]/5 transition">
+              <td class="px-5 py-4 text-[#6fffe9] font-semibold">${no}</td>
+              <td class="px-5 py-4">${item.date}</td>
+              <td class="px-5 py-4">${item.bottles}</td>
+              <td class="px-5 py-4">₹${amount}</td>
+              <td class="px-5 py-4">${item.paidBy}</td>
+              <td class="px-5 py-4 text-center">
+                <button class="px-4 py-1.5 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] hover:bg-[#5bc0be]/30 transition"
+                  onclick="editEntry(${index})">Edit</button>
+              </td>
+            </tr>
+          `;
+
+          mobileCards.innerHTML += `
+            <div class="p-4 rounded-xl bg-[#000814]/40 border border-[#6fffe9]/10">
+              <div class="flex justify-between text-[#6fffe9] mb-2">
+                <span class="font-bold">#${no}</span><span class="text-sm opacity-80">${item.date}</span>
+              </div>
+              <div class="flex justify-between text-[#eaeaea]">
+                  <p>Bottles: ${item.bottles}</p>
+                  <p class="font-semibold">₹${amount}</p>
+              </div>
+              <p class="text-[#eaeaea]/80 mt-1">Paid By: <span class="text-[#6fffe9]">${item.paidBy}</span></p>
+              <button class="mt-3 w-full py-2 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] active:scale-95 transition"
+                onclick="editEntry(${index})">Edit</button>
+            </div>
+          `;
+        });
+      }
+
+      /* ================= START ================= */
+      // 5. Load Data on startup
+      loadData();
+    </script>
+  </body>
+</html>

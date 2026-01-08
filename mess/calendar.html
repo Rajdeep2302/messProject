@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Rajdeep Pal" />
+    <meta property="og:title" content="AquaMonitor" />
+    <link rel="icon" type="image/png" href="./images/my-logo.png">
+    <meta property="og:type" content="website" />
+    <title>AquaMonitor - Calendar</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Audiowide&family=Cinzel+Decorative:wght@400;700;900&family=Indie+Flower&family=Momo+Signature&family=Sirin+Stencil&family=Warnes&family=Yatra+One&family=Zilla+Slab+Highlight:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./css/text.css" />
+
+    <script src="api.js"></script>
+  </head>
+
+  <body
+    class="relative min-h-screen w-screen overflow-x-hidden flex flex-col justify-start items-center py-5"
+  >
+    <video
+      autoplay
+      muted
+      loop
+      playsinline
+      class="fixed top-0 left-0 w-full h-full object-cover -z-20"
+    >
+      <source src="./videos/water-bg.mp4" type="video/mp4" />
+    </video>
+
+    <div
+      class="fixed top-0 left-0 w-full h-full bg-gradient-to-tr from-[#0b132b]/80 to-[#1c2541]/80 -z-10"
+    ></div>
+
+    <header
+      class="fixed top-0 z-50 w-[95vw] sm:w-[92vw] md:w-[90vw] flex justify-center mt-3 sm:mt-4 md:mt-5"
+    >
+      <div
+        class="relative h-[56px] sm:h-[65px] md:h-[75px] w-full flex items-center justify-between"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 rounded-full border border-[#6fffe9]/30 shadow-md shadow-[#000814]/40 backdrop-blur-md"
+        ></div>
+
+        <div
+          class="relative flex items-center"
+          onclick="window.location.href = './index.html'"
+        >
+          <div
+            class="h-[56px] sm:h-[65px] md:h-[75px] aspect-square flex justify-center items-center"
+          >
+            <div
+              class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 h-[45px] sm:h-[52px] md:h-[60px] aspect-square rounded-full border-[#6fffe9]/30 border-b-2 border-r-2 shadow-md shadow-[#000814]/40"
+            ></div>
+            <i
+              class="fa-solid fa-droplet absolute text-[26px] sm:text-[32px] md:text-[40px] text-[#6fffe9]"
+            ></i>
+          </div>
+          <p
+            class="yatra text-[#5bc0be] text-[22px] sm:text-[30px] md:text-[40px] leading-none ml-1 sm:ml-2 whitespace-nowrap"
+          >
+            Aqua<span class="agbalumo text-[#eaeaea]">Monitor</span>
+          </p>
+        </div>
+      </div>
+
+      <button
+        onclick="window.location.href = './calendar.html'"
+        class="relative h-[56px] sm:h-[65px] md:h-[75px] aspect-square flex justify-center ml-2 md:ml-4 items-center scale-105 cursor-default"
+        aria-label="Open calendar"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-[#5bc0be]/20 to-[#6fffe9]/20 rounded-full border border-[#6fffe9] shadow-md shadow-[#000814]/40"
+        ></div>
+        <i
+          class="fa-solid fa-calendar-days text-[22px] sm:text-[28px] md:text-[35px] text-[#6fffe9]"
+        ></i>
+      </button>
+    </header>
+
+    <main
+      class="h-full w-[95vw] sm:w-[92vw] md:w-[90vw] pt-[80px] sm:pt-[97px] md:pt-[115px] flex flex-col gap-3"
+    >
+      <section class="w-full max-w-5xl mx-auto mt-6 flex flex-col gap-6">
+        <div
+          class="flex items-center justify-between bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-5 py-4"
+        >
+          <button
+            id="prevMonth"
+            class="text-[#6fffe9] text-[18px] hover:scale-110 transition"
+            aria-label="Previous Month"
+          >
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+
+          <h2 id="monthLabel" class="sirin text-[#eaeaea] text-[18px]">
+            Loading...
+          </h2>
+
+          <button
+            id="nextMonth"
+            class="text-[#6fffe9] text-[18px] hover:scale-110 transition"
+            aria-label="Next Month"
+          >
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <div
+          class="grid grid-cols-7 text-center text-[#6fffe9] text-[13px] sirin"
+        >
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+
+        <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+
+        <div
+          id="dayDetails"
+          class="hidden bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md p-5"
+        >
+          <h3
+            id="selectedDateLabel"
+            class="sirin text-[#eaeaea] text-[16px] mb-3"
+          >
+            Details
+          </h3>
+          <div
+            id="dayEntries"
+            class="flex flex-col gap-2 text-[#eaeaea] text-[14px]"
+          ></div>
+        </div>
+
+        <div
+          class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md p-5"
+        >
+          <h3 class="sirin text-[#eaeaea] text-[16px] mb-3">Monthly Summary</h3>
+          <div
+            id="monthlySummary"
+            class="grid sm:grid-cols-3 gap-3 text-[#eaeaea] text-[14px]"
+          >
+            <p class="text-white/50 text-sm italic">Loading data...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      /* ================= STATE ================= */
+      const today = new Date();
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth(); // 0-based index
+      let calendarData = []; // Store fetched API data here
+
+      /* ================= ELEMENTS ================= */
+      const calendarGrid = document.getElementById("calendarGrid");
+      const monthLabel = document.getElementById("monthLabel");
+      const dayDetails = document.getElementById("dayDetails");
+      const selectedDateLabel = document.getElementById("selectedDateLabel");
+      const dayEntries = document.getElementById("dayEntries");
+      const monthlySummary = document.getElementById("monthlySummary");
+
+      /* ================= API FETCH ================= */
+      async function loadCalendar() {
+        // Show loading state
+        calendarGrid.innerHTML =
+          '<div class="col-span-7 text-center text-white/50 py-10">Loading...</div>';
+
+        // Prepare year/month for API
+        const year = currentYear;
+        // API likely expects "01", "02", etc. (1-based)
+        const month = String(currentMonth + 1).padStart(2, "0");
+
+        // Update Label Immediately
+        monthLabel.textContent = new Date(
+          currentYear,
+          currentMonth
+        ).toLocaleString("default", {
+          month: "long",
+          year: "numeric",
+        });
+
+        try {
+          // Fetch from API
+          calendarData = await fetchEntriesByMonth(year, month);
+
+          // Render UI
+          renderCalendar();
+        } catch (err) {
+          console.error("Fetch Error:", err);
+          calendarGrid.innerHTML =
+            '<div class="col-span-7 text-center text-red-400 py-10">Failed to load data</div>';
+        }
+      }
+
+      /* ================= CALENDAR RENDER ================= */
+      function renderCalendar() {
+        calendarGrid.innerHTML = "";
+        dayDetails.classList.add("hidden"); // Hide details on month change
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(
+          currentYear,
+          currentMonth + 1,
+          0
+        ).getDate();
+
+        /* Empty cells for previous month padding */
+        for (let i = 0; i < firstDay; i++) {
+          const emptyCell = document.createElement("div");
+          calendarGrid.appendChild(emptyCell);
+        }
+
+        /* Generate Days */
+        for (let day = 1; day <= daysInMonth; day++) {
+          // Format date as YYYY-MM-DD to match API string format
+          const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(
+            2,
+            "0"
+          )}-${String(day).padStart(2, "0")}`;
+
+          // Check if we have data for this specific day
+          const entriesForDay = calendarData.filter((d) => d.date === dateStr);
+          const hasData = entriesForDay.length > 0;
+
+          const isToday =
+            day === today.getDate() &&
+            currentMonth === today.getMonth() &&
+            currentYear === today.getFullYear();
+
+          const cell = document.createElement("div");
+          cell.className = `
+            relative cursor-pointer
+            rounded-xl p-2 h-[72px]
+            transition-all duration-200
+            bg-[#000814]/30
+            hover:bg-[#6fffe9]/10
+            ${hasData ? "ring-1 ring-[#6fffe9]/40 bg-[#6fffe9]/5" : ""}
+            ${isToday ? "ring-2 ring-[#5bc0be] animate-pulse" : ""}
+          `;
+
+          cell.innerHTML = `
+            <span class="text-[#eaeaea] text-[14px]">${day}</span>
+            ${
+              hasData
+                ? `<span class="absolute bottom-2 right-2 px-2 py-[2px] text-[10px] font-semibold bg-[#6fffe9]/20 text-[#6fffe9] rounded-full">
+                    DATA
+                   </span>`
+                : ""
+            }
+          `;
+
+          cell.onclick = () => {
+            // UI Selection Styling
+            document
+              .querySelectorAll("#calendarGrid > div")
+              .forEach((d) => d.classList.remove("ring-2", "ring-[#6fffe9]"));
+            cell.classList.remove("animate-pulse"); // Stop pulse if clicked
+            cell.classList.add("ring-2", "ring-[#6fffe9]");
+
+            showDayDetails(dateStr, entriesForDay);
+          };
+
+          calendarGrid.appendChild(cell);
+        }
+
+        renderMonthlySummary();
+      }
+
+      /* ================= DAY DETAILS ================= */
+      function showDayDetails(dateStr, entries) {
+        selectedDateLabel.textContent = `Details for ${new Date(
+          dateStr
+        ).toDateString()}`;
+        dayEntries.innerHTML = "";
+
+        if (!entries.length) {
+          dayEntries.innerHTML = `<p class="text-[#eaeaea]/70">No orders for this date.</p>`;
+        } else {
+          entries.forEach((e) => {
+            dayEntries.innerHTML += `
+              <div class="flex justify-between items-center bg-[#000814]/40 rounded-lg px-3 py-2 border border-[#6fffe9]/20">
+                <span class="text-[#6fffe9] font-medium">${e.paidBy}</span>
+                <div class="text-right">
+                  <span class="text-xs text-[#eaeaea]/70 block">${e.bottles} bottle(s)</span>
+                  <span class="text-[#eaeaea]">₹${e.totalAmount}</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+        dayDetails.classList.remove("hidden");
+      }
+
+      /* ================= MONTHLY SUMMARY ================= */
+      function renderMonthlySummary() {
+        const summary = {};
+
+        // Calculate totals based on currently fetched data
+        calendarData.forEach((d) => {
+          summary[d.paidBy] = (summary[d.paidBy] || 0) + d.totalAmount;
+        });
+
+        monthlySummary.innerHTML = "";
+
+        if (Object.keys(summary).length === 0) {
+          monthlySummary.innerHTML = `<p class="text-white/50 col-span-3 text-center">No expenses recorded this month.</p>`;
+          return;
+        }
+
+        Object.entries(summary).forEach(([name, amount]) => {
+          monthlySummary.innerHTML += `
+            <div class="bg-[#000814]/40 rounded-xl px-4 py-3 flex justify-between border border-[#6fffe9]/10">
+              <span>${name}</span>
+              <span class="text-[#6fffe9] font-bold">₹${amount}</span>
+            </div>
+          `;
+        });
+      }
+
+      /* ================= NAVIGATION LOGIC ================= */
+      document.getElementById("prevMonth").onclick = () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
+        loadCalendar(); // ✅ CHANGED: Calls loadCalendar to fetch NEW data
+      };
+
+      document.getElementById("nextMonth").onclick = () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        loadCalendar(); // ✅ CHANGED: Calls loadCalendar to fetch NEW data
+      };
+
+      /* ================= INIT ================= */
+      loadCalendar();
+    </script>
+  </body>
+</html>
