@@ -1,4 +1,9 @@
-const API_BASE = "https://aquamonitor-wmlb.onrender.comapi/water";
+const IS_PROD = window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+const API_BASE = IS_PROD 
+    ? "https://aquamonitor-wmlb.onrender.com/api/water" 
+    : "http://localhost:8080/api/water";
+
+console.log("Environment Detect:", IS_PROD ? "Production" : "Local", API_BASE);
 
 /* GET ALL ENTRIES */
 async function fetchAllEntries() {
