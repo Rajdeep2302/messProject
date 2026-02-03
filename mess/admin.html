@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaMonitor - Admin</title>
+    <link rel="icon" type="image/png" href="/images/my-logo.png">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Audiowide&family=Cinzel+Decorative:wght@400;700;900&family=Indie+Flower&family=Momo+Signature&family=Sirin+Stencil&family=Warnes&family=Yatra+One&family=Zilla+Slab+Highlight:wght@400;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- API -->
+    <script src="./api.js"></script>
+
+    <style>
+        /* Custom Font Assignments matching index.html */
+        .sirin {
+            font-family: 'Sirin Stencil', serif;
+        }
+
+        .arvo {
+            font-family: 'Arvo', serif;
+        }
+
+        .yatra {
+            font-family: 'Yatra One', system-ui;
+        }
+
+        .agbalumo {
+            font-family: 'Agbalumo', system-ui;
+        }
+
+        /* Smooth fade for tabs */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 8, 20, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(111, 255, 233, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(111, 255, 233, 0.5);
+        }
+    </style>
+</head>
+
+<body class="relative min-h-screen w-screen overflow-x-hidden flex flex-col items-center py-5 text-[#eaeaea]">
+
+    <!-- VIDEO BACKGROUND -->
+    <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover -z-20">
+        <source src="./videos/water-bg.mp4" type="video/mp4" />
+    </video>
+    <div class="fixed top-0 left-0 w-full h-full bg-gradient-to-tr from-[#0b132b]/80 to-[#1c2541]/80 -z-10"></div>
+
+    <!-- LOGIN OVERLAY -->
+    <div id="loginOverlay"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0b132b]/95 backdrop-blur-md">
+        <div
+            class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-xl shadow-[#000814]/60 p-8 flex flex-col items-center gap-6 w-[90%] max-w-sm">
+            <h1 class="sirin text-[#6fffe9] text-3xl">Admin Access</h1>
+
+            <div class="w-full relative">
+                <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-[#6fffe9]/60"></i>
+                <input type="email" id="adminEmail" placeholder="Admin Email"
+                    class="w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl pl-12 pr-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9] transition">
+            </div>
+
+            <div class="w-full relative">
+                <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-[#6fffe9]/60"></i>
+                <input type="password" id="adminPass" placeholder="Password"
+                    class="w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl pl-12 pr-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9] transition">
+            </div>
+
+            <button onclick="checkLogin()"
+                class="w-full py-3 rounded-xl bg-gradient-to-r from-[#5bc0be]/20 to-[#6fffe9]/20 border border-[#6fffe9]/30 text-[#6fffe9] font-bold sirin tracking-wider hover:bg-[#6fffe9]/10 hover:scale-[1.02] transition active:scale-95 shadow-lg">
+                ENTER DASHBOARD
+            </button>
+            <p id="loginError" class="text-red-400 text-sm hidden font-semibold bg-red-500/10 px-3 py-1 rounded">Invalid
+                Credentials</p>
+        </div>
+    </div>
+
+    <!-- DASHBOARD CONTAINER -->
+    <div id="dashboard" class="hidden w-[95vw] sm:w-[92vw] md:w-[90vw] max-w-6xl">
+
+        <!-- HEADER -->
+        <header class="flex justify-between items-center mb-6 sm:mb-8">
+            <div class="flex items-center gap-3">
+                <div
+                    class="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-user-shield text-[#6fffe9] text-lg sm:text-xl"></i>
+                </div>
+                <h2 class="sirin text-2xl sm:text-3xl text-[#eaeaea]">Admin<span class="text-[#6fffe9]">Panel</span>
+                </h2>
+            </div>
+            <button onclick="logout()"
+                class="px-4 py-2 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Logout</span>
+            </button>
+        </header>
+
+        <!-- TABS -->
+        <div class="flex flex-wrap gap-3 mb-6">
+            <button
+                class="tab-btn active px-6 py-2 rounded-xl border border-transparent text-[#aaa] hover:text-[#eaeaea] transition bg-[#ffffff]/5 hover:bg-[#ffffff]/10"
+                onclick="switchTab('manage', this)">
+                <i class="fa-solid fa-list-check mr-2"></i>Manage Data
+            </button>
+            <button
+                class="tab-btn px-6 py-2 rounded-xl border border-transparent text-[#aaa] hover:text-[#eaeaea] transition bg-[#ffffff]/5 hover:bg-[#ffffff]/10"
+                onclick="switchTab('stats', this)">
+                <i class="fa-solid fa-chart-pie mr-2"></i>Statistics
+            </button>
+            <button
+                class="tab-btn px-6 py-2 rounded-xl border border-transparent text-[#aaa] hover:text-[#eaeaea] transition bg-[#ffffff]/5 hover:bg-[#ffffff]/10"
+                onclick="switchTab('email', this)">
+                <i class="fa-solid fa-paper-plane mr-2"></i>Email Tools
+            </button>
+        </div>
+
+        <!-- STYLE FOR ACTIVE TAB (Dynamic) -->
+        <style>
+            .tab-btn.active {
+                background: linear-gradient(to bottom right, rgba(91, 192, 190, 0.1), rgba(111, 255, 233, 0.1));
+                border: 1px solid rgba(111, 255, 233, 0.3);
+                color: #6fffe9;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+        </style>
+
+        <!-- ================= TAB 1: MANAGE DATA ================= -->
+        <div id="manage" class="tab-content active space-y-6">
+
+            <!-- CONTROLS: Add & View -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- ADD ENTRY FORM -->
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                    <h3 class="sirin text-[#6fffe9] text-lg mb-4 flex items-center gap-2"><i
+                            class="fa-solid fa-plus-circle"></i> Add New Entry</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <input type="date" id="addDate"
+                            class="flex-1 min-w-[140px] bg-[#000814]/40 border border-[#6fffe9]/30 rounded-lg px-3 py-2 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+                        <select id="addName"
+                            class="flex-1 min-w-[120px] bg-[#000814]/40 border border-[#6fffe9]/30 rounded-lg px-3 py-2 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+                            <option value="Santu Da" class="bg-[#0b132b]">Santu Da</option>
+                            <option value="Subhadip" class="bg-[#0b132b]">Subhadip</option>
+                            <option value="Rajdeep" class="bg-[#0b132b]">Rajdeep</option>
+                        </select>
+                        <input type="number" id="addBottles" placeholder="Btls"
+                            class="w-[80px] bg-[#000814]/40 border border-[#6fffe9]/30 rounded-lg px-3 py-2 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+                        <button onclick="adminAddEntry()"
+                            class="bg-[#6fffe9]/20 hover:bg-[#6fffe9]/30 border border-[#6fffe9]/30 text-[#6fffe9] px-4 py-2 rounded-lg transition"><i
+                                class="fa-solid fa-check"></i></button>
+                    </div>
+                </div>
+
+                <!-- DATE SELECTOR -->
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-5 shadow-lg backdrop-blur-sm flex flex-col justify-center">
+                    <h3 class="sirin text-[#aaa] text-sm mb-2">Viewing Month</h3>
+                    <div class="flex gap-3">
+                        <input type="month" id="viewMonthPicker" onchange="loadAdminTable()"
+                            class="flex-1 bg-[#000814]/40 border border-[#6fffe9]/30 rounded-lg px-3 py-2 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+                        <button onclick="loadAdminTable()"
+                            class="bg-[#ffffff]/5 hover:bg-[#ffffff]/10 border border-white/10 text-[#eaeaea] px-4 py-2 rounded-lg transition"><i
+                                class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div
+                class="overflow-x-auto rounded-2xl bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 shadow-lg backdrop-blur-sm">
+                <table class="w-full border-separate border-spacing-0 text-left">
+                    <thead>
+                        <tr class="bg-[#000814]/40 text-[#6fffe9] sirin text-sm uppercase tracking-wider">
+                            <th class="px-5 py-4 border-b border-[#6fffe9]/20">Date</th>
+                            <th class="px-5 py-4 border-b border-[#6fffe9]/20">Name</th>
+                            <th class="px-5 py-4 border-b border-[#6fffe9]/20">Bottles</th>
+                            <th class="px-5 py-4 border-b border-[#6fffe9]/20">Cost</th>
+                            <th class="px-5 py-4 border-b border-[#6fffe9]/20 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody" class="arvo text-sm text-[#eaeaea]"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= TAB 2: STATISTICS ================= -->
+        <div id="stats" class="tab-content space-y-6">
+
+            <div
+                class="flex items-center gap-4 bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-4 w-fit">
+                <span class="text-[#aaa] text-sm">Target Month:</span>
+                <input type="month" id="statsMonthPicker" onchange="loadStats()"
+                    class="bg-[#000814]/40 border border-[#6fffe9]/30 rounded-lg px-3 py-1 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+            </div>
+
+            <!-- CARDS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-[#aaa] text-sm mb-1">Total Expense</p>
+                        <p id="statTotalExpense" class="text-3xl font-bold text-[#6fffe9]">₹0</p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-[#6fffe9]/10 flex items-center justify-center">
+                        <i class="fa-solid fa-indian-rupee-sign text-[#6fffe9] text-xl"></i>
+                    </div>
+                </div>
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-[#aaa] text-sm mb-1">Total Bottles</p>
+                        <p id="statTotalBottles" class="text-3xl font-bold text-[#6fffe9]">0</p>
+                    </div>
+                    <div class="h-12 w-12 rounded-full bg-[#6fffe9]/10 flex items-center justify-center">
+                        <i class="fa-solid fa-wine-bottle text-[#6fffe9] text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Pie -->
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-4 h-[350px] relative">
+                    <canvas id="expensePieChart"></canvas>
+                </div>
+                <!-- Bar -->
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-4 h-[350px] relative">
+                    <canvas id="dailyBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- PER PERSON LIST -->
+            <div>
+                <h3 class="sirin text-[#6fffe9] text-xl mb-4">Breakdown</h3>
+                <div id="personStats" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: EMAIL TOOLS ================= -->
+        <div id="email" class="tab-content">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- CONTROLS -->
+                <div
+                    class="bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl p-6 h-fit">
+                    <h3 class="sirin text-[#6fffe9] text-xl mb-2">Send Report</h3>
+                    <p class="text-[#aaa] text-sm mb-6">Manually trigger monthly report emails.</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[#eaeaea] text-sm mb-1">Select Month</label>
+                            <input type="month" id="emailMonth" onchange="updateEmailPreview()"
+                                class="w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+                        </div>
+
+                        <div>
+                            <label class="block text-[#eaeaea] text-sm mb-1">Recipient</label>
+                            <div class="relative">
+                                <select id="emailRecipient"
+                                    class="w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9] appearance-none">
+                                    <option value="All" class="bg-[#0b132b]">All Registered (Env)</option>
+                                    <option value="Rajdeep" class="bg-[#0b132b]">Rajdeep</option>
+                                    <option value="Subhadip" class="bg-[#0b132b]">Subhadip</option>
+                                    <option value="Santu Da" class="bg-[#0b132b]">Santu Da</option>
+                                    <option value="Custom" class="bg-[#0b132b]">Custom Email...</option>
+                                </select>
+                                <i
+                                    class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[#6fffe9]/50 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <input type="email" id="customEmailInput" placeholder="Enter recipient email"
+                            class="hidden w-full bg-[#000814]/40 border border-[#6fffe9]/30 rounded-xl px-4 py-3 text-[#eaeaea] outline-none focus:border-[#6fffe9]">
+
+                        <button onclick="sendManualEmail()"
+                            class="w-full py-3 mt-2 rounded-xl bg-[#6fffe9]/20 hover:bg-[#6fffe9]/30 border border-[#6fffe9]/30 text-[#6fffe9] font-bold transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> Send Report
+                        </button>
+
+                        <p id="emailStatus" class="text-center font-bold min-h-[24px]"></p>
+                    </div>
+                </div>
+
+                <!-- PREVIEW -->
+                <div
+                    class="lg:col-span-2 bg-[#0b132b] border border-[#6fffe9]/30 rounded-2xl overflow-hidden shadow-xl h-[800px] relative">
+                    <div
+                        class="absolute top-0 left-0 w-full bg-[#000814]/80 p-2 text-center text-xs text-[#aaa] border-b border-[#6fffe9]/20 z-10">
+                        PREVIEW</div>
+                    <iframe id="reportPreviewFrame" class="w-full h-full border-none pt-8"></iframe>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        const CORRECT_PASS = "Pal@2302";
+
+        /* LOGIN */
+        function checkLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPass').value;
+
+            if (pass === CORRECT_PASS && email.includes("@")) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+
+                // Init Defaults
+                const now = new Date();
+                const currentMonthVal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                document.getElementById('viewMonthPicker').value = currentMonthVal;
+                document.getElementById('statsMonthPicker').value = currentMonthVal;
+                document.getElementById('emailMonth').value = currentMonthVal;
+
+                loadAdminTable();
+                updateEmailPreview();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function logout() { location.reload(); }
+
+        /* TABS */
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if (tabId === 'stats') loadStats();
+        }
+
+        document.getElementById('emailRecipient').addEventListener('change', function () {
+            const input = document.getElementById('customEmailInput');
+            if (this.value === 'Custom') input.classList.remove('hidden');
+            else input.classList.add('hidden');
+        });
+
+        /* MANAGE DATA */
+        async function loadAdminTable() {
+            const picker = document.getElementById('viewMonthPicker').value;
+            if (!picker) return;
+            const [year, month] = picker.split('-');
+
+            try {
+                const data = await fetchEntriesByMonth(year, month);
+                const tbody = document.getElementById('adminTableBody');
+                tbody.innerHTML = "";
+
+                data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                data.forEach(item => {
+                    const amount = item.amount || item.bottles * 25;
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-[#6fffe9]/5 transition border-b border-[#6fffe9]/10 last:border-0">
+                            <td class="px-5 py-4 border-b border-[#6fffe9]/10">${item.date}</td>
+                            <td class="px-5 py-4 border-b border-[#6fffe9]/10 font-bold">${item.paidBy}</td>
+                            <td class="px-5 py-4 border-b border-[#6fffe9]/10">${item.bottles}</td>
+                            <td class="px-5 py-4 border-b border-[#6fffe9]/10 text-[#6fffe9]">₹${amount}</td>
+                            <td class="px-5 py-4 border-b border-[#6fffe9]/10 text-right">
+                                <button onclick="adminDelete('${item._id}')" class="text-red-400 hover:text-red-300 hover:bg-red-500/20 px-3 py-1 rounded transition text-xs border border-red-500/30">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        async function adminAddEntry() {
+            const date = document.getElementById('addDate').value;
+            const paidBy = document.getElementById('addName').value;
+            const bottles = document.getElementById('addBottles').value;
+
+            if (!date || !bottles) return alert("Fill all fields");
+
+            const entry = { date, bottles: Number(bottles), paidBy, totalAmount: Number(bottles) * 25 };
+
+            try {
+                await addEntry(entry);
+                alert("Entry Added!");
+                loadAdminTable();
+            } catch (e) { alert("Error adding: " + e.message); }
+        }
+
+        async function adminDelete(id) {
+            if (!confirm("Are you sure you want to delete this entry?")) return;
+            try {
+                const res = await fetch(`http://localhost:8080/api/water/${id}`, { method: 'DELETE' });
+                if (res.ok) loadAdminTable();
+                else alert("Failed to delete");
+            } catch (e) { console.error(e); }
+        }
+
+        /* STATISTICS */
+        let pieChartInstance = null;
+        let barChartInstance = null;
+
+        async function loadStats() {
+            const picker = document.getElementById('statsMonthPicker').value;
+            if (!picker) return;
+            const [year, month] = picker.split('-');
+
+            try {
+                const data = await fetchEntriesByMonth(year, month);
+
+                let totalExp = 0, totalBot = 0;
+                const personMap = {};
+
+                data.forEach(d => {
+                    const amt = d.amount || d.bottles * 25;
+                    totalExp += amt;
+                    totalBot += d.bottles;
+                    if (!personMap[d.paidBy]) personMap[d.paidBy] = { amt: 0, bots: 0 };
+                    personMap[d.paidBy].amt += amt;
+                    personMap[d.paidBy].bots += d.bottles;
+                });
+
+                document.getElementById('statTotalExpense').textContent = `₹${totalExp}`;
+                document.getElementById('statTotalBottles').textContent = totalBot;
+
+                const pContainer = document.getElementById('personStats');
+                pContainer.innerHTML = "";
+                Object.keys(personMap).forEach(name => {
+                    pContainer.innerHTML += `
+                        <div class="bg-gradient-to-r from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/20 rounded-xl p-4 flex justify-between items-center">
+                            <span class="font-bold text-[#eaeaea]">${name}</span>
+                            <div class="text-right">
+                                <div class="text-[#6fffe9] font-bold text-lg">₹${personMap[name].amt}</div>
+                                <div class="text-xs text-[#aaa]">${personMap[name].bots} bottles</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                updateCharts(data, personMap);
+
+            } catch (e) { console.error(e); }
+        }
+
+        function updateCharts(data, personMap) {
+            // Pie
+            const labels = Object.keys(personMap);
+            const values = labels.map(n => personMap[n].amt);
+
+            // Bar
+            const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+            const dailyBottles = {};
+            sortedData.forEach(d => {
+                const day = d.date.split('-')[2];
+                dailyBottles[day] = (dailyBottles[day] || 0) + d.bottles;
+            });
+
+            const ctxPie = document.getElementById('expensePieChart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: values, backgroundColor: ['#6fffe9', '#5bc0be', '#3a506b'], borderWidth: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#eaeaea' } } }
+                }
+            });
+
+            const ctxBar = document.getElementById('dailyBarChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dailyBottles),
+                    datasets: [{ label: 'Bottles', data: Object.values(dailyBottles), backgroundColor: 'rgba(111, 255, 233, 0.5)', borderRadius: 4 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#aaa' }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        /* EMAIL */
+        async function sendManualEmail() {
+            const picker = document.getElementById('emailMonth').value;
+            const rType = document.getElementById('emailRecipient').value;
+            const status = document.getElementById('emailStatus');
+            const customEmail = document.getElementById('customEmailInput').value;
+
+            if (!picker) return alert("Select month");
+            const [year, month] = picker.split('-');
+            const payload = { year: Number(year), month: Number(month) };
+
+            if (rType === 'Custom') {
+                if (!customEmail) return alert("Enter custom email");
+                payload.email = customEmail;
+            } else if (rType !== 'All') {
+                payload.userName = rType;
+            }
+
+            status.textContent = "Sending...";
+            status.className = "text-center font-bold text-[#6fffe9] animate-pulse";
+
+            try {
+                const res = await fetch('http://localhost:8080/api/water/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    status.textContent = "✅ " + (json.message || "Sent!");
+                    status.className = "text-center font-bold text-[#6fffe9]";
+                } else {
+                    status.textContent = "❌ " + (json.message || "Failed");
+                    status.className = "text-center font-bold text-red-400";
+                }
+            } catch (e) {
+                status.textContent = "❌ Error";
+                status.className = "text-center font-bold text-red-400";
+            }
+        }
+
+        function updateEmailPreview() {
+            const picker = document.getElementById('emailMonth').value;
+            if (!picker) return;
+            const [year, month] = picker.split('-');
+            const frame = document.getElementById('reportPreviewFrame');
+            frame.src = `./mail.html?year=${year}&month=${month}`;
+        }
+    </script>
+</body>
+
+</html>

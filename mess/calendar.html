@@ -95,6 +95,21 @@
       class="h-full w-[95vw] sm:w-[92vw] md:w-[90vw] pt-[80px] sm:pt-[97px] md:pt-[115px] flex flex-col gap-3"
     >
       <section class="w-full max-w-5xl mx-auto mt-6 flex flex-col gap-6">
+        <!-- New Year Stats Box -->
+        <div
+          class="w-full sm:w-fit mx-auto bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-8 py-4 flex flex-col items-center gap-2"
+        >
+          <p class="sirin text-[#eaeaea] text-[16px]">
+            Total bottles in <span id="yearDisplay" class="text-[#6fffe9]">...</span>
+          </p>
+          <p
+            class="arvo text-[#eaeaea] text-[40px] font-bold leading-none"
+            id="yearTotalCount"
+          >
+            0
+          </p>
+        </div>
+
         <div
           class="flex items-center justify-between bg-gradient-to-br from-[#5bc0be]/10 to-[#6fffe9]/10 border border-[#6fffe9]/30 rounded-2xl shadow-md shadow-[#000814]/40 backdrop-blur-md px-5 py-4"
         >
@@ -169,6 +184,7 @@
       let currentYear = today.getFullYear();
       let currentMonth = today.getMonth(); // 0-based index
       let calendarData = []; // Store fetched API data here
+      let loadedYearForStats = null; // Track which year's stats are loaded
 
       /* ================= ELEMENTS ================= */
       const calendarGrid = document.getElementById("calendarGrid");
@@ -177,6 +193,8 @@
       const selectedDateLabel = document.getElementById("selectedDateLabel");
       const dayEntries = document.getElementById("dayEntries");
       const monthlySummary = document.getElementById("monthlySummary");
+      const yearDisplay = document.getElementById("yearDisplay");
+      const yearTotalCount = document.getElementById("yearTotalCount");
 
       /* ================= API FETCH ================= */
       async function loadCalendar() {
@@ -198,6 +216,9 @@
           year: "numeric",
         });
 
+        // Trigger Yearly Update if needed
+        updateYearlyStats(year);
+
         try {
           // Fetch from API
           calendarData = await fetchEntriesByMonth(year, month);
@@ -208,6 +229,27 @@
           console.error("Fetch Error:", err);
           calendarGrid.innerHTML =
             '<div class="col-span-7 text-center text-red-400 py-10">Failed to load data</div>';
+        }
+      }
+
+      async function updateYearlyStats(year) {
+        // Only fetch if we haven't already loaded this year's stats
+        if (loadedYearForStats === year) return;
+        
+        yearDisplay.textContent = year;
+        yearTotalCount.textContent = "...";
+
+        try {
+          // We fetch ALL entries and filter locally for now since we don't have a getByYear API
+          const allEntries = await fetchAllEntries();
+          const yearEntries = allEntries.filter((e) => e.date.startsWith(year));
+          const totalBottles = yearEntries.reduce((sum, e) => sum + e.bottles, 0);
+
+          yearTotalCount.textContent = totalBottles;
+          loadedYearForStats = year;
+        } catch (err) {
+          console.error("Failed to load yearly stats:", err);
+          yearTotalCount.textContent = "-";
         }
       }
 

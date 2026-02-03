@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Rajdeep Pal" />
+    <meta property="og:title" content="AquaMonitor - Report" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="./images/my-logo.png" />
+    <title>AquaMonitor - Monthly Report</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Audiowide&family=Cinzel+Decorative:wght@400;700;900&family=Indie+Flower&family=Momo+Signature&family=Sirin+Stencil&family=Warnes&family=Yatra+One&family=Zilla+Slab+Highlight:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/text.css" />
+    <script src="./api.js"></script>
+
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --color-primary: #6fffe9;
+            --color-secondary: #5bc0be;
+            --color-dark: #000814;
+            --color-bg-deep: #0b132b;
+            --color-bg-light: #1c2541;
+            --color-text: #eaeaea;
+            --color-danger: #ef4444;
+            /* red-500 */
+        }
+
+        body {
+            margin: 0;
+            padding: 20px 0;
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            box-sizing: border-box;
+            background-color: var(--color-bg-deep);
+            /* Fallback */
+        }
+
+        /* Backgrounds */
+        .bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -20;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top right, rgba(11, 19, 43, 0.8), rgba(28, 37, 65, 0.8));
+            z-index: -10;
+        }
+
+        /* Main Content */
+        main {
+            height: 100%;
+            width: 95vw;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 56rem;
+            /* max-w-4xl */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (min-width: 640px) {
+            main {
+                width: 92vw;
+            }
+        }
+
+        @media (min-width: 768px) {
+            main {
+                width: 90vw;
+            }
+        }
+
+        /* Typography Helper Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-primary {
+            color: var(--color-primary);
+        }
+
+        .text-text {
+            color: var(--color-text);
+        }
+
+        .title {
+            color: var(--color-text);
+            font-size: 24px;
+        }
+
+        @media (min-width: 640px) {
+            .title {
+                font-size: 32px;
+            }
+        }
+
+        .subtitle {
+            color: var(--color-primary);
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        @media (min-width: 640px) {
+            .subtitle {
+                font-size: 22px;
+            }
+        }
+
+        /* Component: Glass Card */
+        .glass-card {
+            background: linear-gradient(to bottom right, rgba(91, 192, 190, 0.1), rgba(111, 255, 233, 0.1));
+            border: 1px solid rgba(111, 255, 233, 0.3);
+            border-radius: 1rem;
+            /* rounded-2xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 8, 20, 0.4);
+            backdrop-filter: blur(12px);
+            padding: 20px;
+        }
+
+        .card-header {
+            color: var(--color-text);
+            font-size: 18px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(111, 255, 233, 0.2);
+            padding-bottom: 8px;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        @media (min-width: 640px) {
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .summary-item {
+            background-color: rgba(0, 8, 20, 0.4);
+            border-radius: 0.75rem;
+            /* rounded-xl */
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(111, 255, 233, 0.1);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            text-align: left;
+        }
+
+        th {
+            padding: 8px 16px;
+            color: var(--color-primary);
+            font-size: 14px;
+        }
+
+        @media (min-width: 640px) {
+            th {
+                font-size: 16px;
+            }
+        }
+
+        td {
+            padding: 12px 16px;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        tr.data-row {
+            background-color: rgba(0, 8, 20, 0.2);
+            transition: background-color 0.2s;
+        }
+
+        tr.data-row:hover {
+            background-color: rgba(111, 255, 233, 0.05);
+        }
+
+        /* Rounded corners for table rows */
+        tr.data-row td:first-child {
+            border-top-left-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
+        }
+
+        tr.data-row td:last-child {
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+        }
+
+        .status-badge-got {
+            background-color: rgba(91, 192, 190, 0.2);
+            color: var(--color-primary);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-badge-give {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            /* red-300 */
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Utils */
+        .hidden {
+            display: none;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .opacity-70 {
+            opacity: 0.7;
+        }
+
+        .text-red-400 {
+            color: #f87171;
+        }
+
+        .text-red-500 {
+            color: #ef4444;
+        }
+
+        .text-white-50 {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+
+        .footer-row {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(111, 255, 233, 0.3);
+            display: flex;
+            justify-content: flex-end;
+            gap: 24px;
+            color: var(--color-text);
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+
+<body>
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="./videos/water-bg.mp4" type="video/mp4" />
+    </video>
+
+    <div class="bg-overlay"></div>
+
+    <main>
+        <!-- Title -->
+        <div class="text-center">
+            <h1 class="sirin title">
+                Previous Month Report
+            </h1>
+            <p id="reportMonthLabel" class="sirin subtitle">
+                Loading...
+            </p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="glass-card">
+            <h3 class="sirin card-header">
+                Expense Summary
+            </h3>
+            <div id="monthlySummary" class="summary-grid text-text">
+                <p class="text-white-50 text-sm italic">Loading data...</p>
+            </div>
+        </div>
+
+        <!-- Detailed List -->
+        <div class="glass-card">
+            <h3 class="sirin card-header">
+                Detailed Log
+            </h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr class="sirin">
+                            <th>Date</th>
+                            <th>Paid By</th>
+                            <th class="text-right">Bottles</th>
+                            <th class="text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTable" class="arvo">
+                        <tr>
+                            <td colspan="4" class="text-center text-white-50" style="padding: 20px;">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total Footer -->
+            <div class="footer-row">
+                <div class="text-right">
+                    <p class="text-sm opacity-70">Total Bottles</p>
+                    <p class="text-xl font-bold text-primary" id="totalBottlesFooter">0</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm opacity-70">Total Amount</p>
+                    <p class="text-xl font-bold text-primary" id="totalAmountFooter">₹0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settlement Table -->
+        <div class="glass-card">
+            <h3 class="sirin card-header">
+                Settlement Breakdown
+            </h3>
+            <p class="text-text opacity-70 text-sm mb-4">
+                Per Head Share: <span id="perHeadValue" class="text-primary font-bold">...</span>
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr class="sirin">
+                            <th>Name</th>
+                            <th class="text-right">Contributed</th>
+                            <th class="text-right">Per Head</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="settlementTable" class="arvo">
+                        <tr>
+                            <td colspan="4" class="text-center text-white-50" style="padding: 20px;">
+                                Calculating...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /* ================= ELEMENTS ================= */
+        const reportMonthLabel = document.getElementById("reportMonthLabel");
+        const monthlySummary = document.getElementById("monthlySummary");
+        const reportTable = document.getElementById("reportTable");
+        const totalBottlesFooter = document.getElementById("totalBottlesFooter");
+        const totalAmountFooter = document.getElementById("totalAmountFooter");
+
+        /* ================= LOGIC ================= */
+        async function loadReport() {
+            // 1. Determine Month Range (URL params or Previous Month default)
+            let year, monthStr, targetDate;
+
+            const params = new URLSearchParams(window.location.search);
+            const pYear = params.get('year');
+            const pMonth = params.get('month');
+
+            if (pYear && pMonth) {
+                // Use provided params
+                year = Number(pYear);
+                const monthIndex = Number(pMonth) - 1; // 0-based
+                monthStr = String(pMonth).padStart(2, "0");
+                targetDate = new Date(year, monthIndex, 1);
+            } else {
+                // Default: Previous Month
+                const now = new Date();
+                targetDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                year = targetDate.getFullYear();
+                const monthIndex = targetDate.getMonth();
+                monthStr = String(monthIndex + 1).padStart(2, "0");
+            }
+
+            // Display Label
+            reportMonthLabel.textContent = targetDate.toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+            });
+
+            try {
+                // 2. Fetch Data
+                const data = await fetchEntriesByMonth(year, monthStr);
+
+                // Sort by Date Ascending
+                data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                // 3. Render
+                renderSummary(data);
+                renderTable(data);
+                renderSettlement(data);
+
+            } catch (err) {
+                console.error("Error loading report:", err);
+                monthlySummary.innerHTML = `<p class="text-red-400">Error: ${err.message}</p>`;
+                reportTable.innerHTML = `<tr><td colspan="4" class="text-center text-red-500 py-4">
+            Start Error: <br/> ${err.name}: ${err.message} <br/>
+            (Check if api.js is loaded and server is running on 8080)
+          </td></tr>`;
+            }
+        }
+
+        function renderSummary(data) {
+            const summary = {};
+
+            data.forEach((d) => {
+                summary[d.paidBy] = (summary[d.paidBy] || 0) + (d.amount || d.bottles * 25);
+            });
+
+            monthlySummary.innerHTML = "";
+
+            if (Object.keys(summary).length === 0) {
+                monthlySummary.innerHTML = `<p class="text-white-50" style="grid-column: span 3; text-align: center;">No activity found for this month.</p>`;
+                return;
+            }
+
+            Object.entries(summary).forEach(([name, amount]) => {
+                monthlySummary.innerHTML += `
+            <div class="summary-item">
+              <span class="font-bold text-text">${name}</span>
+              <span class="text-primary font-bold text-xl">₹${amount}</span>
+            </div>
+          `;
+            });
+        }
+
+        function renderTable(data) {
+            reportTable.innerHTML = "";
+            let totalB = 0;
+            let totalA = 0;
+
+            if (data.length === 0) {
+                reportTable.innerHTML = `<tr><td colspan="4" class="text-center text-white-50" style="padding: 20px;">No records found.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const amount = item.amount || item.bottles * 25;
+                totalB += item.bottles;
+                totalA += amount;
+
+                reportTable.innerHTML += `
+                <tr class="data-row">
+                    <td>${item.date}</td>
+                    <td class="text-primary font-bold opacity-90">${item.paidBy}</td>
+                    <td class="text-right">${item.bottles}</td>
+                    <td class="text-right">₹${amount}</td>
+                </tr>
+            `;
+            });
+
+            // Update Footers
+            totalBottlesFooter.textContent = totalB;
+            totalAmountFooter.textContent = `₹${totalA}`;
+        }
+
+        function renderSettlement(data) {
+            const settlementTable = document.getElementById("settlementTable");
+            const perHeadValue = document.getElementById("perHeadValue");
+
+            const members = ["Santu Da", "Subhadip", "Rajdeep"];
+            let grandTotal = 0;
+            const contributions = {};
+            members.forEach(m => contributions[m] = 0);
+
+            data.forEach(item => {
+                const amount = item.amount || item.bottles * 25;
+                grandTotal += amount;
+                const payer = members.find(m => m.toLowerCase() === item.paidBy.trim().toLowerCase());
+                if (payer) contributions[payer] += amount;
+            });
+
+            const average = members.length > 0 ? grandTotal / members.length : 0;
+            perHeadValue.textContent = `₹${average.toFixed(2)}`;
+
+            settlementTable.innerHTML = "";
+
+            members.forEach(member => {
+                const paid = contributions[member];
+                const diff = paid - average;
+
+                let statusHtml = "";
+                if (diff > 0) {
+                    statusHtml = `<span class="status-badge-got">Got ₹${Math.abs(diff).toFixed(0)}</span>`;
+                } else if (diff < 0) {
+                    statusHtml = `<span class="status-badge-give">Give ₹${Math.abs(diff).toFixed(0)}</span>`;
+                } else {
+                    statusHtml = `<span class="text-white-50 text-sm">-</span>`;
+                }
+
+                settlementTable.innerHTML += `
+                    <tr class="data-row">
+                        <td class="font-bold text-text opacity-90">${member}</td>
+                        <td class="text-right text-primary">₹${paid}</td>
+                        <td class="text-right opacity-70">₹${average.toFixed(0)}</td>
+                        <td class="text-center">${statusHtml}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        loadReport();
+    </script>
+</body>
+
+</html>

@@ -485,7 +485,18 @@
       // 2. Fetch data from backend
       async function loadData() {
         try {
-          bottleData = await fetchAllEntries(); // Function from api.js
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const currentMonth = String(now.getMonth() + 1).padStart(2, "0");
+
+          // Update header text to show current month and year
+          const monthName = now.toLocaleDateString("en-GB", { month: "long" });
+          document.getElementById(
+            "showCurrentYear"
+          ).textContent = `${monthName} ${currentYear}`;
+
+          // Fetch only current month data
+          bottleData = await fetchEntriesByMonth(currentYear, currentMonth);
 
           // Optional: Sort by date descending (Newest first)
           bottleData.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -755,10 +766,32 @@
         }
         emptyState.classList.add("hidden");
 
+        const now = new Date();
+        const currentMonthIdx = now.getMonth();
+        const currentYearVal = now.getFullYear();
+
         data.forEach((item, index) => {
           const no = String(index + 1).padStart(2, "0");
           // Calculate amount if API doesn't send it
           const amount = item.amount || item.bottles * PRICE_PER_BOTTLE;
+
+          // Check if entry is editable (must be same month/year)
+          // parsing 'YYYY-MM-DD'
+          const itemDate = new Date(item.date);
+          const isEditable =
+            itemDate.getMonth() === currentMonthIdx &&
+            itemDate.getFullYear() === currentYearVal;
+
+          const editButton = isEditable
+            ? `<button class="px-4 py-1.5 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] hover:bg-[#5bc0be]/30 transition"
+                  onclick="editEntry(${index})">Edit</button>`
+            : `<button class="px-4 py-1.5 rounded-full bg-gray-600/20 text-gray-500 cursor-not-allowed"
+                  title="Past month data cannot be edited">Locked</button>`;
+
+          const editButtonMobile = isEditable
+            ? `<button class="mt-3 w-full py-2 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] active:scale-95 transition"
+                onclick="editEntry(${index})">Edit</button>`
+            : `<button class="mt-3 w-full py-2 rounded-full bg-gray-600/20 text-gray-500 cursor-not-allowed" disabled>Locked</button>`;
 
           tableBody.innerHTML += `
             <tr class="bg-[#000814]/30 hover:bg-[#6fffe9]/5 transition">
@@ -768,8 +801,7 @@
               <td class="px-5 py-4">₹${amount}</td>
               <td class="px-5 py-4">${item.paidBy}</td>
               <td class="px-5 py-4 text-center">
-                <button class="px-4 py-1.5 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] hover:bg-[#5bc0be]/30 transition"
-                  onclick="editEntry(${index})">Edit</button>
+                ${editButton}
               </td>
             </tr>
           `;
@@ -784,8 +816,7 @@
                   <p class="font-semibold">₹${amount}</p>
               </div>
               <p class="text-[#eaeaea]/80 mt-1">Paid By: <span class="text-[#6fffe9]">${item.paidBy}</span></p>
-              <button class="mt-3 w-full py-2 rounded-full bg-[#5bc0be]/20 text-[#6fffe9] active:scale-95 transition"
-                onclick="editEntry(${index})">Edit</button>
+              ${editButtonMobile}
             </div>
           `;
         });
