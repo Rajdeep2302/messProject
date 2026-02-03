@@ -1,4 +1,5 @@
-const IS_PROD = window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+const hostname = window.location.hostname;
+const IS_PROD = hostname !== "localhost" && hostname !== "127.0.0.1" && hostname !== "";
 const API_BASE = IS_PROD 
     ? "https://aquamonitor-wmlb.onrender.com/api/water" 
     : "http://localhost:8080/api/water";
