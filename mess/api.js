@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api/water";
+const API_BASE = "https://aquamonitor-wmlb.onrender.comapi/water";
 
 /* GET ALL ENTRIES */
 async function fetchAllEntries() {
